@@ -1,9 +1,34 @@
 <?php
+define('JSON_FILE', 'allowed_ips.json');
+define('ENCRYPTION_KEY', 'BuBirGizliAnahtar123'); // Değiştirilmesi gereken güvenli bir anahtar
+
+function encryptData($data) {
+    return openssl_encrypt($data, 'AES-256-CBC', ENCRYPTION_KEY, 0, ENCRYPTION_KEY);
+}
+
+function decryptData($data) {
+    return openssl_decrypt($data, 'AES-256-CBC', ENCRYPTION_KEY, 0, ENCRYPTION_KEY);
+}
+
+function saveData($data) {
+    $encryptedData = encryptData(json_encode($data));
+    file_put_contents(JSON_FILE, $encryptedData);
+}
+
+function loadData() {
+    if (!file_exists(JSON_FILE)) {
+        return [];
+    }
+    $encryptedData = file_get_contents(JSON_FILE);
+    $decryptedData = decryptData($encryptedData);
+    return json_decode($decryptedData, true);
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
     $delete_ips = $_POST['ip'];
-    $allowed_ips = file('allowed_ips.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $allowed_ips = loadData();
     $allowed_ips = array_diff($allowed_ips, $delete_ips);
-    file_put_contents('allowed_ips.txt', implode(PHP_EOL, $allowed_ips) . PHP_EOL);
+    saveData($allowed_ips);
     $message = "Seçilen IP adresleri başarıyla silindi.";
 }
 
@@ -12,11 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit'])) {
     $new_ip = trim($_POST['new_ip']);
 
     if (filter_var($new_ip, FILTER_VALIDATE_IP)) {
-        $allowed_ips = file('allowed_ips.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $allowed_ips = loadData();
         $key = array_search($original_ip, $allowed_ips);
         if ($key !== false) {
             $allowed_ips[$key] = $new_ip;
-            file_put_contents('allowed_ips.txt', implode(PHP_EOL, $allowed_ips) . PHP_EOL);
+            saveData($allowed_ips);
             $message = "IP adresi başarıyla değiştirildi.";
         }
     } else {
@@ -28,14 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add'])) {
     $new_ip = trim($_POST['new_ip']);
 
     if (filter_var($new_ip, FILTER_VALIDATE_IP)) {
-        file_put_contents('allowed_ips.txt', $new_ip . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $allowed_ips = loadData();
+        $allowed_ips[] = $new_ip;
+        saveData($allowed_ips);
         $message = "IP adresi başarıyla eklendi.";
     } else {
         $message = "Geçersiz IP adresi.";
     }
 }
 
-$allowed_ips = file('allowed_ips.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$allowed_ips = loadData();
 ?>
 
 <!DOCTYPE html>
@@ -113,13 +140,13 @@ $allowed_ips = file('allowed_ips.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_L
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $('#editModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); 
-            var ip = button.data('ip'); 
-            var modal = $(this);
-            modal.find('#original_ip').val(ip);
-            modal.find('#edit_ip').val(ip);
-        });
-    </script>
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); 
+        var ip = button.data('ip'); 
+        var modal = $(this);
+        modal.find('#original_ip').val(ip);
+        modal.find('#edit_ip').val(ip);
+    });
+</script>
 </body>
 </html>
