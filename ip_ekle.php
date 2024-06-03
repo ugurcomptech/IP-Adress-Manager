@@ -1,6 +1,6 @@
 <?php
 define('JSON_FILE', 'allowed_ips.json');
-define('ENCRYPTION_KEY', 'BuBirGizliAnahtar123'); // Değiştirilmesi gereken güvenli bir anahtar
+define('ENCRYPTION_KEY', 'BuBirGizliAnahtar123'); 
 
 function encryptData($data) {
     return openssl_encrypt($data, 'AES-256-CBC', ENCRYPTION_KEY, 0, ENCRYPTION_KEY);
@@ -24,12 +24,16 @@ function loadData() {
     return json_decode($decryptedData, true);
 }
 
+$message = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
     $delete_ips = $_POST['ip'];
     $allowed_ips = loadData();
     $allowed_ips = array_diff($allowed_ips, $delete_ips);
     saveData($allowed_ips);
     $message = "Seçilen IP adresleri başarıyla silindi.";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit'])) {
@@ -47,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit'])) {
     } else {
         $message = "Geçersiz IP adresi.";
     }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add'])) {
@@ -60,6 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add'])) {
     } else {
         $message = "Geçersiz IP adresi.";
     }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 $allowed_ips = loadData();
