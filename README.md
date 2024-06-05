@@ -23,13 +23,22 @@ Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği
 MYSQL Sunucunuza giderek vey PhpMyadmin tarafından bir Database oluşturunuz. Sunucunuza aşağıdaki komutu yazarak bu işlemi sağlayabilirsiniz.
 
 ```mysql
-CREATE DATABASE ip_management;
-USE ip_management;
+CREATE DATABASE ip_management; USE ip_management; CREATE TABLE ips (id INT AUTO_INCREMENT PRIMARY KEY, ip_address VARCHAR(45) NOT NULL);
+```
 
-CREATE TABLE ips (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    ip_address VARCHAR(45) NOT NULL
-);
+Eğer MySQL sadece Lokalde çalışıyor ise `nano /etc/mysql/mariadb.conf.d/50-server.cnf ` dosya yoluna giderek `bind-address=0.0.0.0` olarak güncelleyiniz.
+```
+root@ubuntu:~# netstat -tuln | grep 3306
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN     
+```
+
+Web Sitenizde görüntülemeye çalışınca aşağıdaki gibi bir hata almanız olası bir durumdur. Eğer böyle bir hata alısanız aşağıdaki belirtmiş olunan kodu yazmanız yeterlidir.
+```
+ERROR: Could not connect. SQLSTATE[HY000] [1044] Access denied for user 'user_name'@'%' to database 'database_name' 
+```
+```
+GRANT ALL PRIVILEGES ON database_name.* TO 'user_name'@'%';
+FLUSH PRIVILEGES;
 ```
 
 ## Güvenlik
