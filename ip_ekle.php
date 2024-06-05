@@ -119,6 +119,8 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="form-group">
                 <label for="expiry">Süre (saniye cinsinden):</label>
                 <input type="number" id="expiry" name="expiry" class="form-control" required>
+                <br>
+                <label for="expiry">0(Sıfır)=Süresiz</label>
             </div>
             <button type="submit " name="add" class="btn btn-primary">Ekle</button>
         </form>
