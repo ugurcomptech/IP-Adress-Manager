@@ -18,7 +18,7 @@ Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği
 
 ## Güvenlik
 
-- IP adresleri ve diğer veriler, `allowed_ips.json` dosyasında şifrelenmiş olarak saklanır. Bu, verilerin güvenliğini artırır.
+- IP adresleri ve diğer veriler, MYSQL veritabanında saklanır.
 - Uygulama, giriş doğrulaması veya IP adresi doğrulaması sağlamaz. Bu nedenle, uygulamayı kullanırken dikkatli olunmalıdır.
 
 ## Katkıda Bulunma
