@@ -2,7 +2,7 @@
 
 ![image](https://github.com/ugurcomptech/IP-Adress-Manager/assets/133202238/d6651775-8e3c-4f49-9c11-47201c6affde)
 
-Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği, düzenleyebileceği ve silebileceği bir arayüz sunar. Uygulama, bir JSON dosyasında IP adreslerini ve diğer verileri saklar.
+Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği, düzenleyebileceği ve silebileceği bir arayüz sunar. Uygulama, bir veritabanı dosyasında IP adreslerini ve diğer verileri saklar.
 
 ## Kurulum
 
@@ -15,6 +15,31 @@ Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği
 2. Eklenen IP adresleri listesi altında, her bir IP adresinin yanında bir düzenleme butonu bulunur. Bu düzenleme butonuna tıklayarak o IP adresini düzenleyebilirsiniz.
 3. Aynı listede, her IP adresinin yanında bir seçim kutusu bulunur. Bu kutuları kullanarak birden fazla IP adresini seçip "Sil" butonuna tıklayarak seçili IP adreslerini silebilirsiniz.
 
+# IP Adresi Yönetimi
+
+IP Adresi Yönetimi, bir web tabanlı uygulamadır ve kullanıcıların IP adreslerini eklemelerine, düzenlemelerine ve silebilmelerine olanak tanır. Ayrıca IP adreslerinin eklenme süresini belirleyerek, belirli bir süre sonunda otomatik olarak silinmelerini sağlar.
+
+## Özellikler
+
+### 1. IP Ekleme
+
+Kullanıcılar yeni bir IP adresi ekleyebilirler. Eklenen IP adresi, belirli bir süre boyunca sistemde tutulur ve sürenin sonunda otomatik olarak silinir.
+
+### 2. IP Düzenleme
+
+Var olan bir IP adresini düzenlemek isteyen kullanıcılar, mevcut IP adresini yeni bir IP adresi ile değiştirebilirler. Bu işlem doğrultusunda, IP adresi güncellenecektir.
+
+### 3. IP Silme
+
+Kullanıcılar, sistemdeki belirli IP adreslerini seçerek silebilirler. Bu işlem sonunda, seçilen IP adresleri sistemden kaldırılır.
+
+### 4. Süresi Dolan IP Adreslerinin Otomatik Silinmesi
+
+Sistem, herhangi bir IP adresinin eklenme süresinin dolup dolmadığını kontrol eder. Süresi dolmuş olan IP adresleri, otomatik olarak veritabanından silinir.
+
+### 5. Kalan Sürenin Gösterilmesi
+
+Her IP adresi için, eklenme süresinin dolmasına kadar kalan süre tabloda gösterilir. Bu sayede kullanıcılar, IP adreslerinin ne zaman silineceğini takip edebilirler.
 
 
 ## MYSQL 
@@ -35,10 +60,26 @@ Web Sitenizde görüntülemeye çalışınca aşağıdaki gibi bir hata almanız
 ```
 ERROR: Could not connect. SQLSTATE[HY000] [1044] Access denied for user 'user_name'@'%' to database 'database_name' 
 ```
-```
+```mysql
 GRANT ALL PRIVILEGES ON database_name.* TO 'user_name'@'%';
 FLUSH PRIVILEGES;
 ```
+
+
+Eklenmiş olunan yeni 2 özellik için bir kaç kod daha yazmamız gerekecek. 
+
+IP adresinin süresinin bitimini göstermek için MySql de aşağıdaki komutu çalıştırmanız gerekecek.
+
+```mysql
+ ALTER TABLE ips ADD creation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD expiry_seconds INT UNSIGNED NOT NULL DEFAULT 0;
+```
+
+Süre tutma özelliği için aşağıdaki komutu çalıştırın.
+
+```mysql
+ALTER TABLE ips ADD COLUMN expiry_date DATETIME;
+```
+
 
 ## Güvenlik
 
