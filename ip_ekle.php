@@ -95,41 +95,74 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>IP Adresi Yönetimi</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .table thead {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .modal-header {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .modal-title {
+            color: #fff;
+        }
+
+        .centered {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">IP Adresi Yönetimi</h1>
+        <h1 class="mb-4 centered">IP Adresi Yönetimi</h1>
         <?php if (!empty($message)): ?>
             <div class="alert alert-info" role="alert">
                 <?php echo $message; ?>
             </div>
         <?php endif; ?>
 
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" class="mb-4">
+        <form id="addForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" class="mb-4">
             <div class="form-group">
                 <label for="new_ip">Yeni IP Adresi:</label>
                 <input type="text" id="new_ip" name="new_ip" class="form-control" required>
+                <div id="ipError" class="text-danger mt-2" style="display:none;">Geçersiz IP adresi.</div>
             </div>
             <div class="form-group">
                 <label for="expiry">Süre (saniye cinsinden):</label>
                 <input type="number" id="expiry" name="expiry" class="form-control" required>
-                <br>
-                <label for="expiry">0(Sıfır)=Süresiz</label>
             </div>
-            <button type="submit " name="add" class="btn btn-primary">Ekle</button>
+            <button type="submit" name="add" class="btn btn-success">Ekle</button>
         </form>
 
         <h2>Ekli Olan IP Adresleri</h2>
         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
             <?php if (!empty($allowed_ips)): ?>
                 <table class="table">
-                    <thead>
+                <thead class="thead-dark">
                         <tr>
                             <th scope="col">IP Adresi</th>
                             <th scope="col">Kalan Süre (saniye)</th>
@@ -142,6 +175,7 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?php echo htmlspecialchars($ip['ip_address']); ?></td>
                                 <td><?php echo htmlspecialchars($ip['remaining_seconds']); ?></td>
                                 <td>
+                                    <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editModal" data-ip="<?php echo htmlspecialchars($ip['ip_address']); ?>">Düzenle</button>
                                     <input type="checkbox" name="ip[]" value="<?php echo htmlspecialchars($ip['ip_address']); ?>">
                                 </td>
                             </tr>
@@ -170,6 +204,7 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="form-group">
                                 <label for="edit_ip">Yeni IP Adresi:</label>
                                 <input type="text" id="edit_ip" name="new_ip" class="form-control" required>
+                                <div id="editIpError" class="text-danger mt-2" style="display:none;">Geçersiz IP adresi.</div>
                             </div>
                             <input type="hidden" name="original_ip" id="original_ip">
                             <button type="submit" name="edit" class="btn btn-primary">Kaydet</button>
@@ -184,12 +219,37 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        function validateIp(ip) {
+            const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
+            return ipRegex.test(ip);
+        }
+
+        document.getElementById('addForm').addEventListener('submit', function(event) {
+            const newIp = document.getElementById('new_ip').value;
+            if (!validateIp(newIp)) {
+                document.getElementById('ipError').style.display = 'block';
+                event.preventDefault();
+            } else {
+                document.getElementById('ipError').style.display = 'none';
+            }
+        });
+
         $('#editModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); 
             var ip = button.data('ip'); 
             var modal = $(this);
             modal.find('#original_ip').val(ip);
             modal.find('#edit_ip').val(ip);
+        });
+
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            const newIp = document.getElementById('edit_ip').value;
+            if (!validateIp(newIp)) {
+                document.getElementById('editIpError').style.display = 'block';
+                event.preventDefault();
+            } else {
+                document.getElementById('editIpError').style.display = 'none';
+            }
         });
     </script>
 </body>
