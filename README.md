@@ -16,6 +16,22 @@ Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği
 2. Eklenen IP adresleri listesi altında, her bir IP adresinin yanında bir düzenleme butonu bulunur. Bu düzenleme butonuna tıklayarak o IP adresini düzenleyebilirsiniz.
 3. Aynı listede, her IP adresinin yanında bir seçim kutusu bulunur. Bu kutuları kullanarak birden fazla IP adresini seçip "Sil" butonuna tıklayarak seçili IP adreslerini silebilirsiniz.
 
+
+
+## MYSQL 
+
+MYSQL Sunucunuza giderek vey PhpMyadmin tarafından bir Database oluşturunuz. Sunucunuza aşağıdaki komutu yazarak bu işlemi sağlayabilirsiniz.
+
+```mysql
+CREATE DATABASE ip_management;
+USE ip_management;
+
+CREATE TABLE ips (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL
+);
+```
+
 ## Güvenlik
 
 - IP adresleri ve diğer veriler, MYSQL veritabanında saklanır.
