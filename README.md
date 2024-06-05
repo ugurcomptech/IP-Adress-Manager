@@ -8,7 +8,6 @@ Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği
 
 1. Bu projeyi klonlayın veya indirin.
 2. Bir web sunucusunda veya yerel bir sunucuda proje dizinine erişim sağlayın.
-3. `allowed_ips.json` dosyasının yazılabilir olduğundan emin olun.
 
 ## Kullanım
 
