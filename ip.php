@@ -12,5 +12,4 @@ if (!in_array($visitor_ip, $allowed_ips)) {
     exit();
 }
 
-echo 'Hoş geldiniz, izin verilen IP adresinden giriş yaptınız!';
 ?>
