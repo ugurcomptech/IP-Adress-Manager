@@ -1,13 +1,16 @@
 <?php
-$allowed_ips_file = 'allowed_ips.json';
-$allowed_ips = file($allowed_ips_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+require_once 'db.php'; // Veritabanı bağlantısı
 
 $visitor_ip = $_SERVER['REMOTE_ADDR'];
+
+$stmt = $pdo->prepare("SELECT ip_address FROM ips");
+$stmt->execute();
+$allowed_ips = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 if (!in_array($visitor_ip, $allowed_ips)) {
     header('HTTP/1.1 403 Forbidden');
     exit();
 }
 
-echo 'Hoş geldiniz, izin verilen IP adresinden giri yaptınız!';
+echo 'Hoş geldiniz, izin verilen IP adresinden giriş yaptınız!';
 ?>
