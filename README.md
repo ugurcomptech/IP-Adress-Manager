@@ -41,6 +41,7 @@ Sistem, herhangi bir IP adresinin eklenme süresinin dolup dolmadığını kontr
 
 Her IP adresi için, eklenme süresinin dolmasına kadar kalan süre tabloda gösterilir. Bu sayede kullanıcılar, IP adreslerinin ne zaman silineceğini takip edebilirler.
 
+**Not:** Süreyi "0" olarak yazarsanız süresiz olarak belirler.
 
 ## MYSQL 
 
