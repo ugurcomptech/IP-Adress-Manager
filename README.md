@@ -1,6 +1,6 @@
 # IP-Adress-Manager
 
-![image](https://github.com/ugurcomptech/IP-Adress-Manager/assets/133202238/d6651775-8e3c-4f49-9c11-47201c6affde)
+![image](https://github.com/ugurcomptech/IP-Adress-Manager/assets/133202238/97d12976-d477-4f28-aac2-5631b87abff8)
 
 Bu basit PHP uygulaması, kullanıcının belirli IP adreslerini ekleyebileceği, düzenleyebileceği ve silebileceği bir arayüz sunar. Uygulama, bir veritabanı dosyasında IP adreslerini ve diğer verileri saklar.
 
