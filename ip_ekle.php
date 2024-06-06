@@ -92,6 +92,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['check_expiry'])) {
 // Ekli IP adreslerini getirme
 $stmt = $pdo->query("SELECT ip_address, TIMESTAMPDIFF(SECOND, NOW(), expiry_date) AS remaining_seconds FROM ips");
 $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+// Arama ve filtreleme parametrelerini al
+$search_ip = isset($_GET['search_ip']) ? trim($_GET['search_ip']) : '';
+$filter_expiry = isset($_GET['filter_expiry']) ? $_GET['filter_expiry'] : '';
+
+// Ekli IP adreslerini getirme sorgusu
+$query = "SELECT ip_address, TIMESTAMPDIFF(SECOND, NOW(), expiry_date) AS remaining_seconds FROM ips WHERE 1=1";
+
+// Arama kriterini ekle
+if (!empty($search_ip)) {
+    $query .= " AND ip_address LIKE :search_ip";
+}
+
+// Filtre kriterini ekle
+if ($filter_expiry === 'active') {
+    $query .= " AND (expiry_date IS NULL OR expiry_date > NOW())";
+} elseif ($filter_expiry === 'expired') {
+    $query .= " AND expiry_date IS NOT NULL AND expiry_date < NOW()";
+}
+
+$stmt = $pdo->prepare($query);
+
+// Arama parametresini bağla
+if (!empty($search_ip)) {
+    $stmt->bindValue(':search_ip', "%$search_ip%", PDO::PARAM_STR);
+}
+
+$stmt->execute();
+$allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -157,38 +188,55 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <button type="submit" name="add" class="btn btn-success">Ekle</button>
         </form>
+        <form id="searchForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" class="mb-4">
+    <div class="form-group">
+        <label for="search_ip">IP Adresi Ara:</label>
+        <input type="text" id="search_ip" name="search_ip" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="filter_expiry">Süre Filtresi:</label>
+        <select id="filter_expiry" name="filter_expiry" class="form-control">
+            <option value="">Hepsi</option>
+            <option value="active">Aktif IP Adresleri</option>
+            <option value="expired">Süresi Dolmuş IP Adresleri</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Ara</button>
+</form>
 
         <h2>Ekli Olan IP Adresleri</h2>
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-            <?php if (!empty($allowed_ips)): ?>
-                <table class="table">
-                <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">IP Adresi</th>
-                            <th scope="col">Kalan Süre (saniye)</th>
-                            <th scope="col">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($allowed_ips as $ip): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($ip['ip_address']); ?></td>
-                                <td><?php echo htmlspecialchars($ip['remaining_seconds']); ?></td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editModal" data-ip="<?php echo htmlspecialchars($ip['ip_address']); ?>">Düzenle</button>
-                                    <input type="checkbox" name="ip[]" value="<?php echo htmlspecialchars($ip['ip_address']); ?>">
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <button type="submit" name="delete" class="btn btn-danger">Sil</button>
-            <?php else: ?>
-                <p>Henüz ekli IP adresi yok.</p>
-            <?php endif; ?>
-            <!-- Süresi dolan IP adreslerini kontrol etme butonu -->
-            <button type="submit" name="check_expiry" class="btn btn-primary">Süresi Dolan IP Adreslerini Kontrol Et</button>
-        </form>
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+    <?php if (!empty($allowed_ips)): ?>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">IP Adresi</th>
+                    <th scope="col">Kalan Süre (saniye)</th>
+                    <th scope="col">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($allowed_ips as $ip): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($ip['ip_address']); ?></td>
+                        <td><?php echo htmlspecialchars($ip['remaining_seconds']); ?></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editModal" data-ip="<?php echo htmlspecialchars($ip['ip_address']); ?>">Düzenle</button>
+                            <input type="checkbox" name="ip[]" value="<?php echo htmlspecialchars($ip['ip_address']); ?>">
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <button type="submit" name="delete" class="btn btn-danger">Sil</button>
+    <?php else: ?>
+        <p>Arama kriterlerine uygun IP adresi bulunamadı.</p>
+    <?php endif; ?>
+    <button type="submit" name="check_expiry" class="btn btn-primary">Süresi Dolan IP Adreslerini Kontrol Et</button>
+</form>
+
+
+
 
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog">
