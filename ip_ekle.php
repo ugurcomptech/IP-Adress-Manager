@@ -213,7 +213,7 @@ $allowed_ips = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th scope="col">IP Adresi</th>
                             <th scope="col">Kalan Süre (saniye)</th>
-                            <th scope="col">Sil</th>
+                            <th scope="col">Seç</th>
                             <th scope="col">Düzenle</th>
                         </tr>
                     </thead>
