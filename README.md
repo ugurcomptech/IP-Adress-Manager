@@ -81,6 +81,13 @@ Süre tutma özelliği için aşağıdaki komutu çalıştırın.
 ALTER TABLE ips ADD COLUMN expiry_date DATETIME;
 ```
 
+Eğer veritabanı üzerinden veri eklemek istiyorsanız aşağıdaki komutu kullanabilirsiniz.
+
+```mysql
+INSERT INTO `ips` (`id`, `ip_address`) VALUES (1, '1.1.1.1');
+```
+
+
 
 ## Güvenlik
 
